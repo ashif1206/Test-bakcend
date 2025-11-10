@@ -27,7 +27,7 @@ const contactSchema = new Schema({
       message: "Phone number must be 10 digits",
     },
   },
-});
+},{timestamps:true});
 
 
 const contactModel =  model("contact",contactSchema);

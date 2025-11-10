@@ -47,8 +47,22 @@ export const  createContact = async(req,res)=>{
 };
 
 export const getAllContacts = async(req,res)=>{
+    const {keyword,searchBy} = req.query || req.params;
     try{
-        const contacts = await contactModel.find();
+        let contacts;
+        let searchFeild={};
+        if(keyword){
+            if(searchBy){
+            searchFeild[searchBy] = { $regex: keyword, $options: "i" }
+            contacts = await contactModel.find(searchFeild).sort({createdAt:-1});
+            }
+            else{
+                contacts = await contactModel.find({name: { $regex: keyword, $options: "i" }}).sort({createdAt:-1});
+            }
+        }else{
+            contacts = await contactModel.find().sort({createdAt:-1});
+        }
+        
         if(!contacts || contacts.length === 0){
              return handleRes(res,404,{success:false,message:"Data not found or somthing went wrong"}) 
         };
@@ -73,7 +87,7 @@ export const deleteContact = async (req,res)=>{
             return handleRes(res,404,{success:false,message:"Something went wrong or contact not found!!!"})
         };
 
-        return handleRes(res,200,{success:true,message:"Contact Delete Succeffully",contact});
+        return handleRes(res,200,{success:true,message:"Contact Delete Successfully",contact});
 
     }catch(e){
         return handleRes(res,500,{success:false,message:e.message})
